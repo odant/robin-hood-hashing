@@ -16,6 +16,11 @@ if (NOT DEFINED RH_STANDALONE_PROJECT)
     endif ()
 endif()
 
+# fix build error
+if (MSVC)
+    add_definitions(-D__STDC_WANT_SECURE_LIB__=1)
+endif()
+
 if (RH_STANDALONE_PROJECT)
     option(RH_sanitizer "Address sanitizer" OFF)
     option(RH_coverage "Enable coverage" OFF)
