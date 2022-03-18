@@ -7,7 +7,7 @@ required_conan_version = ">=1.33.0"
 
 class GoogleBenchmarkConan(ConanFile):
     name = "robin-hood-hashing"
-    version = "3.11.4+0"
+    version = "3.11.5+0"
     description = "Fast & memory efficient hashtable based on robin hood hashing for C++11/14/17/20"
     url = "https://github.com/martinus/robin-hood-hashing"
     homepage = "https://github.com/martinus/robin-hood-hashing"
