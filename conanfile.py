@@ -1,9 +1,9 @@
-from conans import ConanFile, CMake, tools
-from conans.errors import ConanInvalidConfiguration
+from conan import ConanFile, tools
+from conan.errors import ConanInvalidConfiguration
 import shutil
 import os
 
-required_conan_version = ">=1.33.0"
+required_conan_version = ">=1.60.0"
 
 class GoogleBenchmarkConan(ConanFile):
     name = "robin-hood-hashing"
@@ -14,32 +14,34 @@ class GoogleBenchmarkConan(ConanFile):
     author = "Martin Ankerl"
     license = "MIT License"
     exports_sources = ["*"]
-    generators = "cmake"
     no_copy_source = True
+    settings = "os", "compiler", "build_type", "arch"
+    package_type = "header-library"
 
-    _cmake = None
-
-    def source(self):
-        # Wrap the original CMake file to call conan_basic_setup
-        shutil.move("CMakeLists.txt", "CMakeListsOriginal.txt")
-        shutil.move(os.path.join("conan", "CMakeLists.txt"), "CMakeLists.txt")
-
-    def _configure_cmake(self):
-        if self._cmake:
-            return self._cmake
-
-        self._cmake = CMake(self)
-        self._cmake.definitions["RH_STANDALONE_PROJECT"] = "OFF"
-        self._cmake.configure()
-        return self._cmake
-
+    def layout(self):
+        tools.cmake.cmake_layout(self)
+        
+    def generate(self):
+        tc = tools.cmake.CMakeToolchain(self)
+        tc.variables["RH_STANDALONE_PROJECT"] = "OFF"
+        tc.generate()
+        
     def build(self):
-        cmake = self._configure_cmake()
+        cmake = tools.cmake.CMake(self)
+        cmake.configure()
         cmake.build()
 
     def package(self):
-        cmake = self._configure_cmake()
+        cmake = tools.cmake.CMake(self)
         cmake.install()
 
+    def package_id(self):
+        self.info.clear()
+
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        self.cpp_info.set_property("cmake_find_mode", "both")
+        self.cpp_info.set_property("cmake_file_name", "robin_hood")
+        self.cpp_info.set_property("cmake_target_name", "robin_hood::robin_hood")
+        self.cpp_info.libs = []
+        self.cpp_info.bindirs = []
+        self.cpp_info.libdirs = []        
